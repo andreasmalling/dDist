@@ -45,9 +45,7 @@ public class RSAImpl implements RSA {
     public void decrypt() {
         if(p == null || q == null) return;
         System.out.println("Ciphertext c : " + c);
-
-        decryptedM = c.modPow(d,n); // decrypt message to bytearray
-
+        decryptedM = c.modPow(d,n); // decrypt message to big int
         System.out.println("decrypted message is " + decryptedM.toString());
     }
 
