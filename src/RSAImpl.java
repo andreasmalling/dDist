@@ -36,16 +36,18 @@ public class RSAImpl implements RSA {
     @Override
     public void encrypt(String m) {
         if(n == null) return;
-        BigInteger mByte = new BigInteger(m.getBytes());
-        System.out.println("m on byteform: " + m);
-        c = mByte.modPow(e, n);
+        BigInteger mAsInt = new BigInteger(m); // Convert message to a bytearray mByte
+        System.out.println("m: " + mAsInt);
+        c = mAsInt.modPow(e, n); // Create the ciphertext c = m^e mod n
     }
 
     @Override
     public void decrypt() {
         if(p == null || q == null) return;
         System.out.println("Ciphertext c : " + c);
-        decryptedM = c.modPow(d,n);
+
+        decryptedM = c.modPow(d,n); // decrypt message to bytearray
+
         System.out.println("decrypted message is " + decryptedM.toString());
     }
 
