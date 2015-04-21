@@ -1,0 +1,4 @@
+
+javac Main.java RSAImpl.java RSA.java
+java Main
+
