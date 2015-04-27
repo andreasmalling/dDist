@@ -1,4 +1,6 @@
 import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 /**
@@ -8,9 +10,9 @@ import java.util.Random;
 public class RSAImpl implements RSA {
 
     private BigInteger e = new BigInteger("3");
-    private BigInteger p,q,n,d,c = null;
+    private BigInteger p,q,n,d = null;
     private Random rnd = new Random();
-    private BigInteger decryptedM = null;
+
 
 
     @Override
@@ -34,19 +36,67 @@ public class RSAImpl implements RSA {
     }
 
     @Override
-    public void encrypt(String m) {
-        if(n == null) return;
-        BigInteger mAsInt = new BigInteger(m); // Convert message to a bytearray mByte
-        System.out.println("m: " + mAsInt);
-        c = mAsInt.modPow(e, n); // Create the ciphertext c = m^e mod n
+    public BigInteger encrypt(BigInteger m) {
+        if(n == null) return null;
+
+        BigInteger c = m.modPow(e, n); // Create the ciphertext c = m^e mod n
+
+        return c;
     }
 
     @Override
-    public void decrypt() {
-        if(p == null || q == null) return;
+    public BigInteger decrypt(BigInteger c) {
+        if(p == null || q == null) return null;
         System.out.println("Ciphertext c : " + c);
-        decryptedM = c.modPow(d,n); // decrypt message to big int
-        System.out.println("decrypted message is " + decryptedM.toString());
+        BigInteger m = c.modPow(d,n); // decrypt message to big int
+        System.out.println("decrypted message is " + m.toString());
+
+        return m;
+    }
+
+
+    @Override
+    public BigInteger generate(BigInteger m){
+
+        BigInteger c = hashBigInteger(m);
+
+        System.out.println("m hashed: " + c);
+
+        return decrypt(c);
+
+    }
+
+    @Override
+    public boolean verify(BigInteger c, BigInteger m) {
+
+        m = hashBigInteger(m);
+        c = encrypt(c);
+
+        System.out.println("c: " + c);
+        System.out.println("m: " + m);
+
+        if(m == null || c == null) return false;
+
+        if(m.equals(c)) return true;
+
+        return false;
+
+    }
+
+    private BigInteger hashBigInteger(BigInteger message) {
+
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+            md.update(message.toByteArray());
+
+            return new BigInteger(md.digest());
+
+        } catch (NoSuchAlgorithmException e){
+            System.err.println(e);
+        }
+        return null;
+
     }
 
 

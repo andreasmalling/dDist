@@ -6,7 +6,10 @@ import java.math.BigInteger;
 public interface RSA {
 
     public BigInteger keyGen(int k);
-    public void encrypt(String m);
-    public void decrypt();
+    public BigInteger encrypt(BigInteger m);
+    public BigInteger decrypt(BigInteger c);
+    public BigInteger generate(BigInteger m);
+    public boolean verify(BigInteger c, BigInteger m);
+
 
 }
