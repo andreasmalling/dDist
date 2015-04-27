@@ -1,4 +1,6 @@
+#!/bin/bash
+
 
 javac Main.java RSAImpl.java RSA.java
-java Main
+java Main $1
 
