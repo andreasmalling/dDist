@@ -1,6 +1,5 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -19,6 +18,9 @@ public class Server implements Runnable{
          */
         protected int portNumber = 40499;
         protected ServerSocket serverSocket;
+
+        private AuthenticatedKeyExchange ake = new AuthenticatedKeyExchange();
+        private RSA rsa = new RSAImpl(16);
 
         /**
          *
@@ -87,28 +89,45 @@ public class Server implements Runnable{
 
             registerOnPort();
 
-            while (true) {
-                Socket socket = waitForConnectionFromClient();
+            ObjectInputStream fromClient = null;
+            ObjectOutputStream toClient = null;
+            Socket socket = waitForConnectionFromClient();
 
-                if (socket != null) {
-                    System.out.println("Connection from " + socket);
-                    try {
-                        BufferedReader fromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                        String s;
-                        // Read and print what the client is sending
-                        while ((s = fromClient.readLine()) != null) { // Ctrl-D terminates the connection
-                            System.out.println("From the client: " + s);
-                        }
-                        socket.close();
-                    } catch (IOException e) {
-                        // We report but otherwise ignore IOExceptions
-                        System.err.println(e);
-                    }
-                    System.out.println("Connection closed by client.");
-                } else {
-                    // We rather agressively terminate the server on the first connection exception
-                    break;
+            if (socket != null) {
+                System.out.println("Connection from client " + socket);
+
+                try {
+                    fromClient = new ObjectInputStream(socket.getInputStream());
+                    toClient = new ObjectOutputStream(socket.getOutputStream());
+
+                    // Exchange Public-Keys
+                    BigInteger clientPK = (BigInteger) fromClient.readObject();
+                    toClient.writeObject(rsa.getPublicKey());
+
+                    // Get calculation from client
+                    int clientCalc = fromClient.readInt();
+
+                    // Send calculation
+                    int serverCalc = ake.calculate();
+                    toClient.writeInt(serverCalc);
+
+                    // Validate received client-msg
+                    BigInteger signedServerCalc = (BigInteger) fromClient.readObject();
+                    if (rsa.encrypt(signedServerCalc, clientPK).intValue() != serverCalc)
+                        return;
+
+                    // Signed and send received msg
+                    toClient.writeObject(rsa.decrypt(new BigInteger(clientCalc + "")));
+
+                    // Generate common-key
+                    int key = ake.calculate(clientCalc);
+
+                    socket.close();
+                } catch (Exception e) {
+                    // We report but otherwise ignore IOExceptions
+                    System.err.println(e);
                 }
+                System.out.println("Connection closed by client.");
             }
 
             deregisterOnPort();

@@ -23,7 +23,6 @@ public class Main  {
         Thread clientThread = new Thread(client);
         clientThread.start();
 
-
     }
 
 }

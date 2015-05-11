@@ -13,6 +13,9 @@ public class RSAImpl implements RSA {
     private BigInteger p,q,n,d = null;
     private Random rnd = new Random();
 
+    public RSAImpl(int k){
+        keyGen(k);
+    }
 
 
     @Override
@@ -37,6 +40,15 @@ public class RSAImpl implements RSA {
 
     @Override
     public BigInteger encrypt(BigInteger m) {
+        if(n == null) return null;
+
+        BigInteger c = m.modPow(e, n); // Create the ciphertext c = m^e mod n
+
+        return c;
+    }
+
+    @Override
+    public BigInteger encrypt(BigInteger m, BigInteger n) {
         if(n == null) return null;
 
         BigInteger c = m.modPow(e, n); // Create the ciphertext c = m^e mod n
@@ -111,5 +123,9 @@ public class RSAImpl implements RSA {
 
     private boolean notGcdTest(BigInteger p, BigInteger q){
         return (e.gcd(p.subtract(BigInteger.ONE)).equals(BigInteger.ONE) && e.gcd(q.subtract(BigInteger.ONE)).equals(BigInteger.ONE));
+    }
+
+    public BigInteger getPublicKey() {
+        return n;
     }
 }
