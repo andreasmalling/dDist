@@ -14,14 +14,23 @@ public class Main  {
 
     public static void main(String[] args) throws IOException {
 
+        BigInteger m = new BigInteger("123456");
 
-        Server server = new Server();
+        System.out.println("M is " + m);
+
+        BigInteger c = rsa.encrypt(m);
+
+        System.out.println("E(M) is " + c );
+
+        System.out.println("D(E(M)) is " + rsa.decrypt(c));
+
+        /*Server server = new Server();
         Thread serverThread = new Thread(server);
         serverThread.start();
 
         Client client = new Client();
         Thread clientThread = new Thread(client);
-        clientThread.start();
+        clientThread.start();*/
 
     }
 
