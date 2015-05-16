@@ -1,36 +1,15 @@
 import java.net.*;
 import java.io.*;
 
-/**
- *
- * A very simple client which will connect to a server, read from a prompt and
- * send the text to the server.
- */
-
 public class Client implements Runnable {
-
-    /*
-     * Your group should use port number 40HGG, where H is your "hold nummer (1,2 or 3) 
-     * and GG is gruppe nummer 00, 01, 02, ... So, if you are in group 3 on hold 1 you
-     * use the port number 40103. This will avoid the unfortunate situation that you
-     * connect to each others servers.
-     */
     protected int portNumber = 40499;
 
-    /**
-     *
-     * Will print out the IP address of the local host on which this client runs.
-     */
-    protected void printLocalHostAddress() {
-        try {
-            InetAddress localhost = InetAddress.getLocalHost();
-            String localhostAddress = localhost.getHostAddress();
-            System.out.println("I'm a client running with IP address " + localhostAddress);
-        } catch (UnknownHostException e) {
-            System.err.println("Cannot resolve the Internet address of the local host.");
-            System.err.println(e);
-            System.exit(-1);
-        }
+    private AuthenticatedKeyExchange ake = null;
+    private RSA rsa = null;
+
+    public Client(RSA rsa){
+        this.rsa = rsa;
+        ake = new AuthenticatedKeyExchange(rsa);
     }
 
     /**
@@ -49,31 +28,18 @@ public class Client implements Runnable {
 
     public void run() {
         String serverName = "127.0.0.1";
-        System.out.println("Hello world!");
-        System.out.println("Type CTRL-D to shut down the client.");
-
-        printLocalHostAddress();
 
         Socket socket = connectToServer(serverName);
 
         if (socket != null) {
-            System.out.println("Connected to " + socket);
+            System.out.println("Connected to server");
             try {
-                // For reading from standard input
-                BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-                // For sending text to the server
-                PrintWriter toServer = new PrintWriter(socket.getOutputStream(),true);
-                String s;
-                // Read from standard input and send to server
-                // Ctrl-D terminates the connection
-                System.out.print("Type something for the server and then RETURN> ");
-                while ((s = stdin.readLine()) != null && !toServer.checkError()) {
-                    System.out.print("Type something for the server and then RETURN> ");
-                    toServer.println(s);
-                }
+                System.out.println("Client Key is " + ake.handshake(socket));
                 socket.close();
             } catch (IOException e) {
-                // We ignore IOExceptions
+                System.err.println(e);
+            } catch (ClassNotFoundException e) {
+                System.err.println(e);
             }
         }
 
