@@ -23,7 +23,7 @@ public class RSAImpl implements RSA {
 
     private void generateKeys(int k) {
         // Start work indicator
-        ProgressBarRotating pb = new ProgressBarRotating("Locating primes");
+        ProgressBarRotating pb = new ProgressBarRotating("Obtaining primes");
         pb.start();
 
         do {
@@ -75,21 +75,25 @@ public class RSAImpl implements RSA {
         return decrypt(m);
     }
 
-    /**
-     * Compares message with signed hash
-     * @param c signed hash of message
-     * @param m mesage to check against signature
-     * @return returns true if the message matches the signature
-     */
-    @Override
-    public boolean verify(BigInteger c, BigInteger m) {
-        m = hashBigInteger(m);
-        c = encrypt(c);
 
-        if(m.equals(c)) return true;
+    @Override
+    public boolean verify(BigInteger s, BigInteger m) {
+        m = hashBigInteger(m);
+        s = encrypt(s);
+
+        if(m.equals(s)) return true;
 
         return false;
+    }
 
+    @Override
+    public boolean verify(BigInteger s, BigInteger m, BigInteger pk) {
+        m = hashBigInteger(m);
+        s = encrypt(s,pk);
+
+        if(m.equals(s)) return true;
+
+        return false;
     }
 
     private BigInteger hashBigInteger(BigInteger message) {
@@ -105,7 +109,6 @@ public class RSAImpl implements RSA {
             System.err.println(e);
         }
         return null;
-
     }
 
 
