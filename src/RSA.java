@@ -23,5 +23,7 @@ public interface RSA {
 
     BigInteger sign(BigInteger m);
 
+    BigInteger hash(BigInteger m);
+
     BigInteger getPublicKey();
 }

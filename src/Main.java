@@ -3,6 +3,7 @@
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
@@ -59,14 +60,21 @@ public class Main {
         System.out.println("\nM' is " + _m);
         System.out.println("V(S(M), M') is " + rsa.verify(s, _m));
 
-        /* Average */
+        /* "Average" Speed of Hashing*/
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Number of runs for testing average:");
+        double msRun = runHashNTimes(1);
+
+        System.out.println("Time for hashing 10 kb : " + msRun + "ms");
+        System.out.println("Bits per second: " + (2000 / (msRun / 1000)));
+
+        /* Average Speed of Signing */
+
+        System.out.println("Number of runs for testing average signature generation with a 2000 bit key:");
         int runs = Integer.parseInt(scanner.next());
 
-        double msRun = runGenerationNTimes(runs, m);
-        System.out.println("Average time for signature generation: " + msRun + "ms");
+        msRun = runSignatureNTimes(runs, m);
+        System.out.println("\nAverage time for signature generation with a 2000 bit key : " + msRun + "ms");
         System.out.println("Bits per second: " + (2000 / (msRun / 1000)));
 
         System.out.println("======================");
@@ -121,14 +129,36 @@ public class Main {
     }
 
 
-    private static long runGenerationNTimes(int n, BigInteger message){
+    private static long runSignatureNTimes(int n, BigInteger message){
         long totalElapsedTime = 0;
 
         RSA rsa = new RSAImpl(2000);
 
         for (int i = 0; i < n; i++){
             long startTime = System.currentTimeMillis();
-            BigInteger signature = rsa.sign(message);
+            rsa.sign(message);
+            long stopTime = System.currentTimeMillis();
+            long elapsedTime = stopTime - startTime;
+            totalElapsedTime += elapsedTime;
+        }
+
+        return totalElapsedTime / n;
+
+    }
+
+    private static long runHashNTimes(int n){
+        long totalElapsedTime = 0;
+
+        Random rand = new Random(System.currentTimeMillis());
+
+        BigInteger tenKB = new BigInteger("2");
+        tenKB = tenKB.pow(80000);
+        tenKB = tenKB.subtract(BigInteger.ONE);
+
+        for (int i = 0; i < n; i++){
+
+            long startTime = System.currentTimeMillis();
+            rsa.hash(tenKB);
             long stopTime = System.currentTimeMillis();
             long elapsedTime = stopTime - startTime;
             totalElapsedTime += elapsedTime;

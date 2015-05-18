@@ -71,14 +71,14 @@ public class RSAImpl implements RSA {
      */
     @Override
     public BigInteger sign(BigInteger m){
-        m = hashBigInteger(m);
+        m = hash(m);
         return decrypt(m);
     }
 
 
     @Override
     public boolean verify(BigInteger s, BigInteger m) {
-        m = hashBigInteger(m);
+        m = hash(m);
         s = encrypt(s);
 
         if(m.equals(s)) return true;
@@ -88,7 +88,7 @@ public class RSAImpl implements RSA {
 
     @Override
     public boolean verify(BigInteger s, BigInteger m, BigInteger pk) {
-        m = hashBigInteger(m);
+        m = hash(m);
         s = encrypt(s,pk);
 
         if(m.equals(s)) return true;
@@ -96,7 +96,8 @@ public class RSAImpl implements RSA {
         return false;
     }
 
-    private BigInteger hashBigInteger(BigInteger message) {
+    @Override
+    public BigInteger hash(BigInteger message) {
 
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
