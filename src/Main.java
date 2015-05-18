@@ -76,7 +76,7 @@ public class Main {
         System.out.println("\n=== Authenticated Key Exchange ===");
 
         String selection = null;
-        int bitLength = 16;
+        int bitLength = 2000;
 
         ArrayList <String> s = new ArrayList<>();
         s.add("server");

@@ -1,6 +1,3 @@
-
-
-1) Run runrsa.sh with or without argument.
-2) Argument determines amount of signature generations for 
-   timed test. Argument must be a number.
-3) Running with n > infinity at own risk
+1) Run two instances of runrsa.sh
+2) Select server by inputing s, let the server initialize.
+3) Select client by inputing c.
